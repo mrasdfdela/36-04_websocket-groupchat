@@ -48,8 +48,46 @@ class Room {
 
   broadcast(data) {
     for (let member of this.members) {
+      // console.log(`broadcast member: ${member}`);
+      // console.log(JSON.stringify(data));
       member.send(JSON.stringify(data));
     }
+  }
+
+  /** send alert to member of room **/
+  member_alert(member, data){
+    // console.log(`alert member: ${member}`);
+    // console.log(JSON.stringify(data));
+    member.send(JSON.stringify(data));
+  }
+
+  /** send alert to member of room **/
+  member_list(member){
+    let memberList = [];
+    for (let m of this.members){
+      memberList.push(m.name);
+    }
+    member.send(JSON.stringify({"name":"private", "type": "chat", "text":memberList}));
+  }
+
+  /** send private message **/
+  private_msg(member,data){
+    const confirmation = {
+      "name":`${member.name} to ${data.name}`,
+      "type":"chat",
+      "text":data.text
+    }
+    member.send(JSON.stringify(confirmation));
+    
+    let send_to
+    for (let m of this.members){
+      console.log(`${m.name} and ${data.name}`);
+      if (m.name == data.name){
+        send_to = m;
+        data.name = `${member.name} to ${data.name}`
+      }
+    }
+    send_to.send(JSON.stringify(data));
   }
 }
 

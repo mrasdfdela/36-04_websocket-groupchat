@@ -2,6 +2,7 @@
 
 // Room is an abstraction of a chat channel
 const Room = require('./Room');
+const { dadJoke } = require("./static/js/helpers");
 
 /** ChatUser is a individual connection from client -> server to chat. */
 
@@ -40,11 +41,23 @@ class ChatUser {
   /** handle a chat: broadcast to room. */
 
   handleChat(text) {
-    this.room.broadcast({
-      name: this.name,
-      type: 'chat',
-      text: text
-    });
+    if (text=='/joke') {
+      let newJoke = dadJoke();
+      this.room.member_alert(this, newJoke);
+    } else if (text=='/members') {
+      this.room.member_list(this);
+    } else if ( text.includes('/priv')) {
+      let user = text.split(" ")[1]
+      let str = text.split(" ")[2];
+      const data = { name: user, type: "chat", text: str };
+      this.room.private_msg(this, data)
+    } else {
+      this.room.broadcast({
+        name: this.name,
+        type: 'chat',
+        text: text
+      });
+    }
   }
 
   /** Handle messages from client:
